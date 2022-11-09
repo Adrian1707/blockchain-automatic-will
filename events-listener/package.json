@@ -1,0 +1,10 @@
+{
+  "type": "module",
+  "dependencies": {
+    "yarn": "^1.22.19"
+  },
+  "devDependencies": {
+    "nodemailer": "^6.8.0",
+    "web3": "^1.8.0"
+  }
+}
