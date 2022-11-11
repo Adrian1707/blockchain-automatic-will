@@ -11,9 +11,9 @@ contract EstatePlanning {
   address beneficiary;
   address estateOwner;
   uint256 balance;
-  uint256 responseWindow;
+  uint256 checkPulseTime;
   bool estateOwnerAlive;
-  uint immutable waitingThreshold = 2 minutes * 1000;
+  uint immutable waitingThreshold = 30 seconds;
 
   constructor(address _estateOwner, address _beneficiary) {
     estateOwner = _estateOwner;
@@ -38,12 +38,15 @@ contract EstatePlanning {
       revert("Must be the beneficiary to claim the inheritance");
     }
 
-    uint256 timeElapsed = (block.timestamp - responseWindow);
-    if(timeElapsed > waitingThreshold && estateOwnerAlive != true) {
+    if(timePassed() && estateOwnerAlive == false) {
       (bool success, ) = payable(beneficiary).call{value: balance}("");
     } else {
       checkPulse();
     }
+  }
+
+  function timePassed() public view returns (bool) {
+    return (block.timestamp - checkPulseTime) >= waitingThreshold;
   }
 
   function heartBeat() external {
@@ -51,12 +54,12 @@ contract EstatePlanning {
       revert("Must be the estate owner to send a heart beat");
     }
     estateOwnerAlive = true;
-    responseWindow = 0;
+    checkPulseTime = 0;
     emit HeartBeat(msg.sender, true);
   }
 
   function checkPulse() internal {
-    responseWindow = block.timestamp;
+    checkPulseTime = block.timestamp;
     estateOwnerAlive = false;
     emit CheckPulse(msg.sender);
   }
@@ -74,6 +77,6 @@ contract EstatePlanning {
   }
 
   function getResponseWindow() public view returns(uint256) {
-    return responseWindow;
+    return checkPulseTime;
   }
 }

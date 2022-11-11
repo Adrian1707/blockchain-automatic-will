@@ -47,26 +47,7 @@ describe("EstatePlanning", function () {
       expect(transactionReceipt.events[0].event).to.equal("CheckPulse")
     })
 
-    // it("Pay the beneficiary 45 days after last pulse check", async function() {
-    //   beneficiary = (await getNamedAccounts()).beneficiary
-    //   beneficiaryBalance = await ethers.provider.getBalance(beneficiary)
-    //   expect(beneficiaryBalance).to.equal('10000000000000000000000')
-    //   await estatePlanning.addFunds({value: ethers.utils.parseEther("9999.0")})
-    //   originalBeneficiaryBalance = await ethers.provider.getBalance(beneficiary)
-    //   estatePlanning = await ethers.getContract("EstatePlanning", beneficiary)
-    //   await estatePlanning.claimInheritance()
-    //
-    //   latestTime = await time.latest();
-    //   const fourty_five_days_in_milliseconds = 3888000000
-    //   const oneDayInMilliseconds = 86400000
-    //   const daysToWait = 45
-    //   newTime = await time.increase(oneDayInMilliseconds * daysToWait);
-    //   await estatePlanning.claimInheritance()
-    //   newBeneficiaryBalance = await ethers.provider.getBalance(beneficiary)
-    //   expect(newBeneficiaryBalance.toString().startsWith('1999')).to.equal(true)
-    // })
-
-    it("Pay the beneficiary 2 minutes after last pulse check", async function() {
+    it("Pay the beneficiary 30 seconds after last pulse check", async function() {
       beneficiary = (await getNamedAccounts()).beneficiary
       beneficiaryBalance = await ethers.provider.getBalance(beneficiary)
       expect(beneficiaryBalance).to.equal('10000000000000000000000')
@@ -76,31 +57,42 @@ describe("EstatePlanning", function () {
       await estatePlanning.claimInheritance()
 
       latestTime = await time.latest();
-      const oneMinuteInMilliseconds = 60000
-      const minutesToWait = 2
-      newTime = await time.increase(oneMinuteInMilliseconds * minutesToWait);
+      newTime = await time.increase(30);
       await estatePlanning.claimInheritance()
       newBeneficiaryBalance = await ethers.provider.getBalance(beneficiary)
       expect(newBeneficiaryBalance.toString().startsWith('1999')).to.equal(true)
     })
 
-    // it("Does not pay the beneficiary before the 45 day cutoff", async function() {
-    //   beneficiary = (await getNamedAccounts()).beneficiary
-    //   beneficiaryBalance = await ethers.provider.getBalance(beneficiary)
-    //   expect(beneficiaryBalance).to.equal('10000000000000000000000')
-    //   await estatePlanning.addFunds({value: ethers.utils.parseEther("9999.0")})
-    //   originalBeneficiaryBalance = await ethers.provider.getBalance(beneficiary)
-    //   estatePlanning = await ethers.getContract("EstatePlanning", beneficiary)
-    //   await estatePlanning.claimInheritance()
-    //
-    //   latestTime = await time.latest();
-    //   const oneDayInMilliseconds = 86400000
-    //   const daysToWait = 44
-    //   newTime = await time.increase(oneDayInMilliseconds * daysToWait);
-    //   await estatePlanning.claimInheritance()
-    //   newBeneficiaryBalance = await ethers.provider.getBalance(beneficiary)
-    //   expect(newBeneficiaryBalance.toString().startsWith('1999')).to.equal(false)
-    // })
+    it("Pay the beneficiary 30 seconds after last pulse check", async function() {
+      beneficiary = (await getNamedAccounts()).beneficiary
+      beneficiaryBalance = await ethers.provider.getBalance(beneficiary)
+      expect(beneficiaryBalance).to.equal('10000000000000000000000')
+      await estatePlanning.addFunds({value: ethers.utils.parseEther("9999.0")})
+      originalBeneficiaryBalance = await ethers.provider.getBalance(beneficiary)
+      estatePlanning = await ethers.getContract("EstatePlanning", beneficiary)
+      await estatePlanning.claimInheritance()
+
+      newTime = await time.increase(35);
+      await estatePlanning.claimInheritance()
+      newBeneficiaryBalance = await ethers.provider.getBalance(beneficiary)
+      expect(newBeneficiaryBalance.toString().startsWith('1999')).to.equal(true)
+    })
+
+    it("Does not pay the beneficiary before the 30 second cutoff", async function() {
+      beneficiary = (await getNamedAccounts()).beneficiary
+      beneficiaryBalance = await ethers.provider.getBalance(beneficiary)
+      expect(beneficiaryBalance).to.equal('10000000000000000000000')
+      await estatePlanning.addFunds({value: ethers.utils.parseEther("9999.0")})
+      originalBeneficiaryBalance = await ethers.provider.getBalance(beneficiary)
+      estatePlanning = await ethers.getContract("EstatePlanning", beneficiary)
+      await estatePlanning.claimInheritance()
+
+      latestTime = await time.latest();
+      newTime = await time.increase(26);
+      await estatePlanning.claimInheritance()
+      newBeneficiaryBalance = await ethers.provider.getBalance(beneficiary)
+      expect(newBeneficiaryBalance.toString().startsWith('1999')).to.equal(false)
+    })
 
     it("should not allow anyone other than the beneficiary to claim the inheritance", async function() {
       otherAccount = (await getNamedAccounts()).otherAccount
